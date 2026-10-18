@@ -1,0 +1,154 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Catch-all default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == "bgsathyaraju@gmail.com") ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow get: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isSignedIn() && isOwner(userId)
+        && request.resource.data.uid == request.auth.uid
+        && (request.resource.data.role == "member" || isAdmin())
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 128;
+      allow update: if isSignedIn() && (
+        (isOwner(userId) && request.resource.data.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'uid']))
+        || isAdmin()
+      );
+      allow delete: if isAdmin();
+
+      // Private contact subcollection
+      match /private/{docId} {
+        allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
+        allow write: if isSignedIn() && (isOwner(userId) || isAdmin());
+      }
+    }
+
+    // Admins collection
+    match /admins/{adminId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Matrimonial Profiles collection
+    match /matrimonialProfiles/{profileId} {
+      allow read: if true;
+
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.fullName is string && request.resource.data.fullName.size() <= 120
+        && request.resource.data.gender in ['bride', 'groom']
+        && (isAdmin() || request.resource.data.isApproved == false || !('isApproved' in request.resource.data));
+
+      allow update: if isSignedIn() && (
+        (resource.data.userId == request.auth.uid && (
+          isAdmin() ||
+          (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['isApproved', 'approvalStatus', 'userId']))
+        ))
+        || isAdmin()
+      );
+
+      allow delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Interests collection
+    match /interests/{interestId} {
+      allow get: if isSignedIn() && (
+        resource.data.senderId == request.auth.uid ||
+        resource.data.recipientId == request.auth.uid ||
+        isAdmin()
+      );
+
+      allow list: if isSignedIn() && (
+        resource.data.senderId == request.auth.uid ||
+        resource.data.recipientId == request.auth.uid ||
+        isAdmin()
+      );
+
+      allow create: if isSignedIn()
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.recipientId is string
+        && request.resource.data.status == "pending";
+
+      allow update: if isSignedIn() && (
+        (resource.data.recipientId == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']) && request.resource.data.status in ['accepted', 'declined']) ||
+        (resource.data.senderId == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']) && request.resource.data.status == 'withdrawn') ||
+        isAdmin()
+      );
+
+      allow delete: if isSignedIn() && (
+        resource.data.senderId == request.auth.uid || isAdmin()
+      );
+    }
+
+    // Shortlisted Profiles collection
+    match /shortlistedProfiles/{shortlistId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Consultation Requests collection
+    match /consultationRequests/{requestId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && (
+        (resource.data.userId == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['requirements', 'preferredDate', 'preferredTime', 'updatedAt'])) ||
+        isAdmin()
+      );
+      allow delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && (resource.data.recipientId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (resource.data.recipientId == request.auth.uid || isAdmin());
+      allow delete: if isSignedIn() && (resource.data.recipientId == request.auth.uid || isAdmin());
+    }
+
+    // Reported Profiles collection
+    match /reportedProfiles/{reportId} {
+      allow read: if isSignedIn() && (resource.data.reporterId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.reporterId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // App Settings collection
+    match /appSettings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Marriage Consultants collection
+    match /consultants/{consultantId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

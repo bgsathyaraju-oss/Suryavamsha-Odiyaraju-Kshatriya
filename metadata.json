@@ -1,0 +1,6 @@
+{
+  "name": "Suryavamsha Vadiyaraju Kshatriya Matrimony",
+  "description": "Exclusive matrimonial platform for the Suryavamsha Vadiyaraju Kshatriya community featuring verified profiles, partner searches, and marriage consultation services.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

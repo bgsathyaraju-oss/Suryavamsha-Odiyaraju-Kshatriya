@@ -1,0 +1,206 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User account profile document",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["member", "admin"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "PrivateContact": {
+      "title": "PrivateContact",
+      "description": "Private contact details isolated from public profile",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "profileId": { "type": "string", "maxLength": 128 },
+        "contactNumber": { "type": "string", "maxLength": 30 },
+        "email": { "type": "string", "maxLength": 128 },
+        "alternateNumber": { "type": "string", "maxLength": 30 },
+        "address": { "type": "string", "maxLength": 256 },
+        "allowVerifiedMembers": { "type": "boolean" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "contactNumber"]
+    },
+    "MatrimonialProfile": {
+      "title": "MatrimonialProfile",
+      "description": "Public matrimonial profile listing",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "profileId": { "type": "string", "maxLength": 64 },
+        "fullName": { "type": "string", "maxLength": 100 },
+        "gender": { "type": "string", "enum": ["bride", "groom"] },
+        "age": { "type": "number" },
+        "dateOfBirth": { "type": "string", "maxLength": 30 },
+        "surname": { "type": "string", "maxLength": 60 },
+        "fatherName": { "type": "string", "maxLength": 80 },
+        "motherName": { "type": "string", "maxLength": 80 },
+        "maritalStatus": { "type": "string", "maxLength": 40 },
+        "community": { "type": "string", "maxLength": 100 },
+        "subCommunity": { "type": "string", "maxLength": 100 },
+        "gotra": { "type": "string", "maxLength": 60 },
+        "nativePlace": { "type": "string", "maxLength": 100 },
+        "currentCity": { "type": "string", "maxLength": 100 },
+        "state": { "type": "string", "maxLength": 100 },
+        "country": { "type": "string", "maxLength": 100 },
+        "education": { "type": "string", "maxLength": 120 },
+        "occupation": { "type": "string", "maxLength": 120 },
+        "annualIncome": { "type": "string", "maxLength": 60 },
+        "height": { "type": "string", "maxLength": 30 },
+        "languagesKnown": { "type": "array" },
+        "photoUrl": { "type": "string", "maxLength": 1000 },
+        "additionalPhotos": { "type": "array" },
+        "familyDetails": { "type": "string", "maxLength": 1000 },
+        "partnerPreferences": { "type": "object" },
+        "profileDescription": { "type": "string", "maxLength": 1500 },
+        "approvalStatus": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "isApproved": { "type": "boolean" },
+        "isPublished": { "type": "boolean" },
+        "isSuspended": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "fullName", "gender", "age", "community", "nativePlace", "currentCity", "education", "occupation"]
+    },
+    "Interest": {
+      "title": "Interest",
+      "description": "Expression of interest between two matrimonial profiles",
+      "type": "object",
+      "properties": {
+        "senderId": { "type": "string", "maxLength": 128 },
+        "senderProfileId": { "type": "string", "maxLength": 128 },
+        "senderName": { "type": "string", "maxLength": 100 },
+        "senderPhotoUrl": { "type": "string", "maxLength": 1000 },
+        "recipientId": { "type": "string", "maxLength": 128 },
+        "recipientProfileId": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["pending", "accepted", "declined", "withdrawn"] },
+        "message": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["senderId", "senderProfileId", "recipientId", "recipientProfileId", "status"]
+    },
+    "Shortlist": {
+      "title": "Shortlist",
+      "description": "Shortlisted profile item by a member",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "profileId": { "type": "string", "maxLength": 128 },
+        "profileName": { "type": "string", "maxLength": 100 },
+        "profileGender": { "type": "string", "maxLength": 20 },
+        "profilePhotoUrl": { "type": "string", "maxLength": 1000 },
+        "profileCity": { "type": "string", "maxLength": 100 },
+        "profileAge": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "profileId"]
+    },
+    "ConsultationRequest": {
+      "title": "ConsultationRequest",
+      "description": "Marriage consultant appointment request",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "memberName": { "type": "string", "maxLength": 100 },
+        "memberPhone": { "type": "string", "maxLength": 30 },
+        "memberEmail": { "type": "string", "maxLength": 128 },
+        "preferredDate": { "type": "string", "maxLength": 30 },
+        "preferredTime": { "type": "string", "maxLength": 30 },
+        "requirements": { "type": "string", "maxLength": 1000 },
+        "status": { "type": "string", "enum": ["pending", "accepted", "contacted", "completed"] },
+        "notes": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "memberName", "memberPhone", "requirements", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "In-app notifications for users",
+      "type": "object",
+      "properties": {
+        "recipientId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "maxLength": 50 },
+        "title": { "type": "string", "maxLength": 150 },
+        "message": { "type": "string", "maxLength": 500 },
+        "relatedProfileId": { "type": "string", "maxLength": 128 },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["recipientId", "title", "message", "isRead"]
+    },
+    "ReportedProfile": {
+      "title": "ReportedProfile",
+      "description": "Member report for inappropriate profile",
+      "type": "object",
+      "properties": {
+        "reporterId": { "type": "string", "maxLength": 128 },
+        "reportedProfileId": { "type": "string", "maxLength": 128 },
+        "reason": { "type": "string", "maxLength": 150 },
+        "details": { "type": "string", "maxLength": 1000 },
+        "status": { "type": "string", "enum": ["pending", "investigated", "dismissed", "actioned"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["reporterId", "reportedProfileId", "reason", "status"]
+    },
+    "AppSetting": {
+      "title": "AppSetting",
+      "description": "App configuration and announcements",
+      "type": "object",
+      "properties": {
+        "key": { "type": "string", "maxLength": 50 },
+        "value": { "type": "string", "maxLength": 2000 },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["key"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User account document"
+    },
+    "/users/{userId}/private/contact": {
+      "schema": "PrivateContact",
+      "description": "Private contact info for user profile"
+    },
+    "/matrimonialProfiles/{profileId}": {
+      "schema": "MatrimonialProfile",
+      "description": "Public matrimonial profiles"
+    },
+    "/interests/{interestId}": {
+      "schema": "Interest",
+      "description": "Interests sent between members"
+    },
+    "/shortlistedProfiles/{shortlistId}": {
+      "schema": "Shortlist",
+      "description": "Profiles shortlisted by members"
+    },
+    "/consultationRequests/{requestId}": {
+      "schema": "ConsultationRequest",
+      "description": "Marriage consultant booking requests"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notification alerts"
+    },
+    "/reportedProfiles/{reportId}": {
+      "schema": "ReportedProfile",
+      "description": "Reports submitted by members"
+    },
+    "/appSettings/{settingId}": {
+      "schema": "AppSetting",
+      "description": "Global settings and announcements"
+    }
+  }
+}
